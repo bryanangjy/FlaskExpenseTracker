@@ -83,5 +83,9 @@ def modifying_expenses(expense_id):
 @views.route('/del_expense', methods=['POST'])
 # @login_required
 def deleting_expenses():
-    # insert code here
+    expense = Expenses.query.filter(# Expenses.user == current_user.email,
+                                    Expenses.expense_id == request.form.get("id")).first()
+    if expense:
+        db.session.delete(expense)
+        db.session.commit()
     return redirect(url_for("views.show_expenses"))
