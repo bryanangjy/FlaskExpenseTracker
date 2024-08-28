@@ -48,8 +48,35 @@ def show_expenses():
 @views.route('/mod_expense/<int:expense_id>', methods=['GET', 'POST'])
 # @login_required
 def modifying_expenses(expense_id):
-    # insert code here
-    return render_template("mod_expense.html")
+    expense = Expenses.query.filter(# Expenses.user==current_user.email,
+                                    Expenses.expense_id == expense_id).first()
+    if not expense:
+        flash('You do not have this expense.', category='error')
+        return redirect(url_for("views.show_expenses"))
+
+    form = EditExpense(request.form)
+
+    if form.validate_on_submit():
+        expense.type = form.type.data
+        expense.description = form.description.data
+        expense.date_purchase = form.date.data
+        expense.amount = form.amount.data
+        db.session.commit()
+
+        return redirect(url_for("views.show_expenses"))
+
+    else:
+        if request.method == 'GET':
+            form = EditExpense(
+                data = {
+                    "type": expense.type,
+                    "description": expense.description,
+                    "date": date(int(expense.date_purchase[:4]), int(expense.date_purchase[5:7]),
+                                 int(expense.date_purchase[8:])),
+                    "amount": expense.amount
+                }
+            )
+        return render_template("mod_expense.html", form=form)
 
 
 # DELETE
