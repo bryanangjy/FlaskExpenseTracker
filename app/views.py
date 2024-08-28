@@ -19,7 +19,7 @@ def adding_new_expenses():
             type = form.type.data,
             description = form.description.data,
             date_purchase = form.date.data,
-            amount = form.amount.data
+            amount = form.amount.data,
             user = current_user.email
         )
         db.session.add(new_expense)
