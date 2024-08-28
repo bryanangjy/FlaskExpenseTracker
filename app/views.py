@@ -12,8 +12,22 @@ views = Blueprint('views', __name__)
 @views.route('/add_expense', methods=['GET', 'POST'])
 # @login_required
 def adding_new_expenses():
-    # insert code here
-    return render_template("add_expense.html")
+    form = EditExpense(request.form)
+
+    if form.validate_on_submit():
+        new_expense = Expenses(
+            type = form.type.data,
+            description = form.description.data,
+            date_purchase = form.date.data,
+            amount = form.amount.data
+            # user = current_user.email
+        )
+        db.session.add(new_expense)
+        db.session.commit()
+
+        return redirect(url_for("views.show_expenses"))
+
+    return render_template("add_expense.html", form=form)
 
 
 # READ
