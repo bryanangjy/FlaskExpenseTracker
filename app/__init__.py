@@ -1,7 +1,8 @@
 from flask import Flask
 from app.config import Config
+from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-# TODO: import flask_login
+from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from os import path
 
@@ -28,8 +29,13 @@ def create_app(config_class=Config):
         csrf.init_app(app)
 
 
-        # TODO: initialise loginmanager
+        login_manager = LoginManager()
+        login_manager.login_view = 'auth.login'
+        login_manager.init_app(app)
 
+        @login_manager.user_loader
+        def load_user(id):
+            return Users.query.get(id)
 
         from app.auth import auth
         from app.views import views

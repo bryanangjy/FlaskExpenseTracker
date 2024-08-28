@@ -10,7 +10,7 @@ views = Blueprint('views', __name__)
 
 # CREATE
 @views.route('/add_expense', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def adding_new_expenses():
     form = EditExpense(request.form)
 
@@ -20,7 +20,7 @@ def adding_new_expenses():
             description = form.description.data,
             date_purchase = form.date.data,
             amount = form.amount.data
-            # user = current_user.email
+            user = current_user.email
         )
         db.session.add(new_expense)
         db.session.commit()
@@ -32,9 +32,9 @@ def adding_new_expenses():
 
 # READ
 @views.route('/expenses')
-# @login_required
+@login_required
 def show_expenses():
-    expenses_user = Expenses.query.all()
+    expenses_user = Expenses.query.filter_by(user=current_user.email).all()
 
     total_amount = 0
     for expense in expenses_user:
@@ -46,9 +46,9 @@ def show_expenses():
 
 # UPDATE
 @views.route('/mod_expense/<int:expense_id>', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def modifying_expenses(expense_id):
-    expense = Expenses.query.filter(# Expenses.user==current_user.email,
+    expense = Expenses.query.filter(Expenses.user==current_user.email,
                                     Expenses.expense_id == expense_id).first()
     if not expense:
         flash('You do not have this expense.', category='error')
@@ -81,9 +81,9 @@ def modifying_expenses(expense_id):
 
 # DELETE
 @views.route('/del_expense', methods=['POST'])
-# @login_required
+@login_required
 def deleting_expenses():
-    expense = Expenses.query.filter(# Expenses.user == current_user.email,
+    expense = Expenses.query.filter(Expenses.user == current_user.email,
                                     Expenses.expense_id == request.form.get("id")).first()
     if expense:
         db.session.delete(expense)
